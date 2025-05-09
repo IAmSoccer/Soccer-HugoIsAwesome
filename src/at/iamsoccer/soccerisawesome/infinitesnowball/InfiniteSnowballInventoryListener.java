@@ -5,32 +5,22 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
+
+import java.util.EnumSet;
 
 public class InfiniteSnowballInventoryListener implements Listener {
+    private static final EnumSet<InventoryType> BLOCKED_INVENTORIES = EnumSet.of(
+            InventoryType.ANVIL, InventoryType.DISPENSER, InventoryType.GRINDSTONE
+    );
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInvClick(InventoryClickEvent e) {
+        if(!BLOCKED_INVENTORIES.contains(e.getInventory().getType())) return;
+        if (!InfiniteSnowballInteractListener.isMagicSnowball(e.getCurrentItem())) return;
 
-        ItemStack i = e.getCurrentItem();
+        e.getWhoClicked().sendMessage("Gonna stop you right there chief.");
+        e.getWhoClicked().sendMessage("You don't wanna lose that sucker by mistake.");
 
-        if (i == null || i.getItemMeta() == null) {
-            return;
-        }
-
-        if (i.getItemMeta().getPersistentDataContainer().has(InfiniteSnowballCommands.magicSnowball, PersistentDataType.INTEGER)) {
-
-            InventoryType it = e.getInventory().getType();
-            if (it.equals(InventoryType.ANVIL) || it.equals(InventoryType.DISPENSER) || it.equals(InventoryType.GRINDSTONE)) {
-
-                e.getWhoClicked().sendMessage("Gonna stop you right there chief.");
-                e.getWhoClicked().sendMessage("You don't wanna lose that sucker by mistake.");
-
-                e.setCancelled(true);
-            }
-        }
-
+        e.setCancelled(true);
     }
-
 }
