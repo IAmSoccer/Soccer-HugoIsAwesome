@@ -58,7 +58,7 @@ public class InfiniteSnowballCommands extends BaseCommand {
             return;
         }
         ItemStack item = new ItemStack(Material.SNOWBALL, 1);
-        item.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
+        item.addUnsafeEnchantment(Enchantment.INFINITY, 1);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(Component.text("Magic Snowball").color(NamedTextColor.AQUA));
         meta.getPersistentDataContainer().set(magicSnowball, PersistentDataType.INTEGER, ThreadLocalRandom.current().nextInt());
@@ -74,7 +74,7 @@ public class InfiniteSnowballCommands extends BaseCommand {
             sender.sendMessage("User command only");
             return;
         }
-        final Snowman snowman = (Snowman) player.getWorld().spawnEntity(player.getEyeLocation(), EntityType.SNOWMAN);
+        final Snowman snowman = (Snowman) player.getWorld().spawnEntity(player.getEyeLocation(), EntityType.SNOW_GOLEM);
         snowman.setDerp((ThreadLocalRandom.current().nextInt(16) == 7));
         snowman.setVelocity(player.getEyeLocation().getDirection().clone().multiply(3));
         new BukkitRunnable() {
@@ -83,7 +83,7 @@ public class InfiniteSnowballCommands extends BaseCommand {
             int i = 0;
 
             public void run() {
-                snowman.getWorld().spawnParticle(Particle.SNOW_SHOVEL, snowman.getLocation(), 8, 1.0D, 1.0D, 1.0D, 0.2D);
+                snowman.getWorld().spawnParticle(Particle.POOF, snowman.getLocation(), 8, 1.0D, 1.0D, 1.0D, 0.2D);
                 if (++this.i > 15) {
                     Snowball b = (Snowball) snowman.getWorld().spawnEntity(snowman.getEyeLocation(), EntityType.SNOWBALL);
                     b.setVelocity(this.vec);
@@ -92,7 +92,7 @@ public class InfiniteSnowballCommands extends BaseCommand {
                 if (this.i > 38) {
                     Location l = snowman.getLocation();
                     l.getWorld().spawnParticle(Particle.CLOUD, l, 30, 1.0D, 2.0D, 1.0D, 0.1D);
-                    l.getWorld().spawnParticle(Particle.SNOW_SHOVEL, l, 30, 1.0D, 2.0D, 1.0D, 0.05D);
+                    l.getWorld().spawnParticle(Particle.POOF, l, 30, 1.0D, 2.0D, 1.0D, 0.05D);
                     snowman.remove();
                     cancel();
                 }

@@ -13,10 +13,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitTask;
@@ -63,25 +60,31 @@ public class DamageNullifierOnTeleportOrJoinNullifyListener implements Listener 
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onDamageDeal(final EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player && players.containsKey(event.getDamager()))
+        if (event.getDamager() instanceof Player player && players.containsKey(player))
             event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onDamageRecieve(final EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player && players.containsKey(event.getEntity()))
+        if (event.getEntity() instanceof Player player && players.containsKey(player))
             event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onHunger(final FoodLevelChangeEvent event) {
-        if (event.getEntity() instanceof Player && players.containsKey(event.getEntity()))
+        if (event.getEntity() instanceof Player player && players.containsKey(player))
+            event.setCancelled(true);
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onConsume(final PlayerItemConsumeEvent event) {
+        if (players.containsKey(event.getPlayer()))
             event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onRegen(final EntityRegainHealthEvent event) {
-        if (event.getEntity() instanceof Player && players.containsKey(event.getEntity()))
+        if (event.getEntity() instanceof Player player && players.containsKey(player))
             event.setCancelled(true);
     }
 
