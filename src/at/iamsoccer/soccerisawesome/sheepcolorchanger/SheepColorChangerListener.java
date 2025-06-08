@@ -1,5 +1,7 @@
 package at.iamsoccer.soccerisawesome.sheepcolorchanger;
 
+import at.iamsoccer.soccerisawesome.AbstractModule;
+import at.iamsoccer.soccerisawesome.SoccerIsAwesomePlugin;
 import org.bukkit.DyeColor;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
@@ -18,17 +20,21 @@ import java.util.concurrent.ThreadLocalRandom;
  * + is sneaking
  * + has the permssion "sheepcolorchanger.use"
  */
-public class SheepColorChangerListener implements Listener {
+public class SheepColorChangerListener extends AbstractModule implements Listener {
+    public SheepColorChangerListener(SoccerIsAwesomePlugin plugin) {
+        super(plugin, "SheepColorChanger");
+    }
+
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onSheepInteract(PlayerInteractEntityEvent event) {
         // only check sheep interactions and when the main hand was used.
-        if(!(event.getRightClicked() instanceof Sheep sheep) || event.getHand() != EquipmentSlot.HAND || !event.getPlayer().isSneaking()) return;
+        if (!(event.getRightClicked() instanceof Sheep sheep) || event.getHand() != EquipmentSlot.HAND || !event.getPlayer().isSneaking()) return;
         // check the permission
         if (!event.getPlayer().hasPermission("sheepcolorchanger.use")) return;
         // get the main hand item
         final ItemStack itemInHand = event.getPlayer().getInventory().getItem(event.getHand());
         // check if the item is air
-        if(!itemInHand.getType().isAir()) return;
+        if (!itemInHand.getType().isAir()) return;
         // set the sheep color to a random color.
         sheep.setColor(DyeColor.values()[ThreadLocalRandom.current().nextInt(DyeColor.values().length)]);
     }

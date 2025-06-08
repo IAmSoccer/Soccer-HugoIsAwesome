@@ -1,56 +1,86 @@
 package at.iamsoccer.soccerisawesome.colorfulshulkers;
 
+import at.iamsoccer.soccerisawesome.AbstractModule;
+import at.iamsoccer.soccerisawesome.SoccerIsAwesomePlugin;
+import co.aikar.commands.PaperCommandManager;
+import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.Registry;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.intellij.lang.annotations.Subst;
 
-import java.util.Arrays;
-import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import static org.bukkit.Bukkit.getServer;
-
-public class ColorfulShulkers {
-    private static final EnumSet<Material> DYE_MATERIALS = EnumSet.noneOf(Material.class);
+public class ColorfulShulkers extends AbstractModule {
+    private static final Set<String> DYES_NAMES;
 
     static {
         //Add all the dyes to DYE_MATERIALS
-        Arrays.stream(Material.values()).filter(m -> m.name().endsWith("_DYE")).forEach(DYE_MATERIALS::add);
+        DYES_NAMES = Registry.ITEM.stream()
+            .filter(i -> i.key().value().endsWith("_dye"))
+            .map(i -> i.key().value().substring(0, i.key().value().lastIndexOf('_')))
+            .collect(Collectors.toUnmodifiableSet());
     }
 
-    public static boolean tryCreateColorfulShulkerRecipes() {
+    private final Set<NamespacedKey> registeredRecipes = new HashSet<>();
+
+    public ColorfulShulkers(SoccerIsAwesomePlugin plugin) {
+        super(plugin, "ColorfulShulkers");
+    }
+
+    @Override
+    public boolean enable(PaperCommandManager commandManager) {
+        if (!super.enable(commandManager)) return false; // should never fail
+        return tryCreateColorfulShulkerRecipes();
+    }
+
+    @Override
+    public boolean disable(PaperCommandManager commandManager) {
+        if (!super.disable(commandManager)) return false; // should never fail
+        tryRemoveColorfulShulkerRecipes();
+        return true;
+    }
+
+    public boolean tryCreateColorfulShulkerRecipes() {
         //Try to make the recipes!
         try {
-            for (var dye : DYE_MATERIALS) {
-                var colorName = dye.name().substring(0, dye.name().lastIndexOf('_'));
-                String nameKey = colorName + "_shulker_box_craft";
-                ShapelessRecipe someRecipe = new ShapelessRecipe(NamespacedKey.minecraft(nameKey.toLowerCase()), new ItemStack(Material.valueOf(colorName.toUpperCase() + "_SHULKER_BOX")));
-                someRecipe.addIngredient(Material.SHULKER_SHELL);
-                someRecipe.addIngredient(Material.SHULKER_SHELL);
-                someRecipe.addIngredient(Material.CHEST);
-                someRecipe.addIngredient(dye);
-                Bukkit.getServer().addRecipe(someRecipe);
+            for (@Subst("red") var color : DYES_NAMES) {
+                final ItemType dye = Objects.requireNonNull(Registry.ITEM.get(Key.key(color + "_dye")));
+                final ItemType shulker = Objects.requireNonNull(Registry.ITEM.get(Key.key(color + "_shulker_box")));
+                final NamespacedKey key = NamespacedKey.fromString(color + "_colorful_shulker", plugin);
+                Objects.requireNonNull(key, "Key should never be null");
+                final ShapelessRecipe recipe = new ShapelessRecipe(
+                    key,
+                    shulker.createItemStack()
+                );
+                recipe.addIngredient(Material.SHULKER_SHELL);
+                recipe.addIngredient(Material.SHULKER_SHELL);
+                recipe.addIngredient(Material.CHEST);
+                Material dyeMaterial = Objects.requireNonNull(dye.asMaterial());
+                recipe.addIngredient(dyeMaterial);
+
+                Bukkit.getServer().addRecipe(recipe);
+                registeredRecipes.add(key);
             }
             return true;
         } catch (Exception e) {
-            getServer().getConsoleSender().sendMessage(String.valueOf(e));
+            plugin.severe("Failed to load ColorfulShulkers recipes", e);
             return false;
         }
     }
 
-    public static boolean tryRemoveColorfulShulkerRecipes() {
-        //Try to remove the recipes... :(
-        try {
-            for (var dye : DYE_MATERIALS) {
-                var colorName = dye.name().substring(0, dye.name().lastIndexOf('_'));
-                String nameKey = colorName + "_shulker_box_craft";
-                Bukkit.getServer().removeRecipe(NamespacedKey.minecraft(nameKey.toLowerCase()));
-            }
-            return true;
-        } catch (Exception e) {
-            getServer().getConsoleSender().sendMessage(String.valueOf(e));
-            return false;
+    public void tryRemoveColorfulShulkerRecipes() {
+        //remove the recipes... :(
+        // should never fail, since the set only includes registered ones
+        for (var key : registeredRecipes) {
+            Bukkit.getServer().removeRecipe(key);
         }
+        registeredRecipes.clear();
     }
 }
