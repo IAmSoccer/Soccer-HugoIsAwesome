@@ -1,6 +1,10 @@
 package at.iamsoccer.soccerisawesome.lessannoyingitemframes;
 
+import at.iamsoccer.soccerisawesome.AbstractModule;
 import at.iamsoccer.soccerisawesome.SoccerIsAwesomePlugin;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.PaperCommandManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.*;
 import org.bukkit.entity.Entity;
@@ -14,14 +18,46 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LessAnnoyingItemFramesListener implements Listener {
+public class LessAnnoyingItemFramesListener extends AbstractModule implements Listener {
 
     private final Map<Player, Long> lastClick = new HashMap<>();
+
+    private @Nullable BaseCommand command = null;
+
+    public LessAnnoyingItemFramesListener(SoccerIsAwesomePlugin plugin) {
+        super(plugin, "LessAnnoyingItemFrames");
+    }
+
+    @Override
+    public boolean enable(PaperCommandManager commandManager) {
+        if (Bukkit.getPluginManager().getPlugin("LuckPerms") == null) {
+            warn("LuckPerms is not installed!");
+            return false;
+        }
+
+        if (!super.enable(commandManager)) return false;
+
+        command = new LessAnnoyingItemFramesCommands(plugin);
+        commandManager.registerCommand(command);
+        return true;
+    }
+
+    @Override
+    public boolean disable(PaperCommandManager commandManager) {
+        if (!super.disable(commandManager)) return false;
+
+        if (command != null) {
+            commandManager.unregisterCommand(command);
+            command = null;
+        }
+        return true;
+    }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onItemFrameRotate(PlayerInteractEntityEvent event) {
@@ -50,8 +86,7 @@ public class LessAnnoyingItemFramesListener implements Listener {
                     BlockState state = block.getState();
                     blockTypeChecker(player, state);
                     event.setCancelled(true);
-                }
-                else if (player.hasPermission("sia.containertoggle.enabled")) {
+                } else if (player.hasPermission("sia.containertoggle.enabled")) {
                     spamChecker(player, "sia containertoggle");
                     event.setCancelled(true);
                 }

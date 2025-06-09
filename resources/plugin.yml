@@ -13,10 +13,10 @@ prefix: SHIA
 
 database: false
 
-depend:
+depend: []
+softdepend:
   - LuckPerms
   - Essentials
-softdepend: []
 loadbefore: []
 
 

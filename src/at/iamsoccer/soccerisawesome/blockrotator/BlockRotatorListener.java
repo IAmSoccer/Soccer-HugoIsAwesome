@@ -1,5 +1,6 @@
 package at.iamsoccer.soccerisawesome.blockrotator;
 
+import at.iamsoccer.soccerisawesome.AbstractModule;
 import at.iamsoccer.soccerisawesome.SoccerIsAwesomePlugin;
 import org.bukkit.Axis;
 import org.bukkit.Bukkit;
@@ -22,34 +23,36 @@ import org.bukkit.Material;
 
 import java.util.*;
 
-public class BlockRotatorListener implements Listener {
+public class BlockRotatorListener extends AbstractModule implements Listener {
 
-    private final SoccerIsAwesomePlugin plugin;
-    public BlockRotatorListener(SoccerIsAwesomePlugin plugin) {this.plugin = plugin;}
+    public BlockRotatorListener(SoccerIsAwesomePlugin plugin) {
+        super(plugin, "BlockRotator");
+    }
+
     private static final String PERMISSION_USE = "sia.blockrotator.use";
     private static final Material ROTATION_TOOL = Material.BLAZE_ROD;
 
     private static final Set<Material> BANNED_BLOCKS = Set.of(
-            Material.WHITE_BED,
-            Material.ORANGE_BED,
-            Material.MAGENTA_BED,
-            Material.LIGHT_BLUE_BED,
-            Material.YELLOW_BED,
-            Material.LIME_BED,
-            Material.PINK_BED,
-            Material.GRAY_BED,
-            Material.LIGHT_GRAY_BED,
-            Material.CYAN_BED,
-            Material.PURPLE_BED,
-            Material.BLUE_BED,
-            Material.BROWN_BED,
-            Material.GREEN_BED,
-            Material.RED_BED,
-            Material.BLACK_BED,
-            Material.CHEST,
-            Material.TRAPPED_CHEST,
-            Material.ENDER_CHEST,
-            Material.PISTON_HEAD
+        Material.WHITE_BED,
+        Material.ORANGE_BED,
+        Material.MAGENTA_BED,
+        Material.LIGHT_BLUE_BED,
+        Material.YELLOW_BED,
+        Material.LIME_BED,
+        Material.PINK_BED,
+        Material.GRAY_BED,
+        Material.LIGHT_GRAY_BED,
+        Material.CYAN_BED,
+        Material.PURPLE_BED,
+        Material.BLUE_BED,
+        Material.BROWN_BED,
+        Material.GREEN_BED,
+        Material.RED_BED,
+        Material.BLACK_BED,
+        Material.CHEST,
+        Material.TRAPPED_CHEST,
+        Material.ENDER_CHEST,
+        Material.PISTON_HEAD
     );
 
     // Precompute BlockFace → next BlockFace for O(1) lookup
@@ -57,10 +60,10 @@ public class BlockRotatorListener implements Listener {
 
     private static Map<BlockFace, BlockFace> createRotationMap() {
         BlockFace[] faces = {
-                BlockFace.NORTH, BlockFace.NORTH_NORTH_EAST, BlockFace.NORTH_EAST, BlockFace.EAST_NORTH_EAST,
-                BlockFace.EAST, BlockFace.EAST_SOUTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_SOUTH_EAST,
-                BlockFace.SOUTH, BlockFace.SOUTH_SOUTH_WEST, BlockFace.SOUTH_WEST, BlockFace.WEST_SOUTH_WEST,
-                BlockFace.WEST, BlockFace.WEST_NORTH_WEST, BlockFace.NORTH_WEST, BlockFace.NORTH_NORTH_WEST
+            BlockFace.NORTH, BlockFace.NORTH_NORTH_EAST, BlockFace.NORTH_EAST, BlockFace.EAST_NORTH_EAST,
+            BlockFace.EAST, BlockFace.EAST_SOUTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_SOUTH_EAST,
+            BlockFace.SOUTH, BlockFace.SOUTH_SOUTH_WEST, BlockFace.SOUTH_WEST, BlockFace.WEST_SOUTH_WEST,
+            BlockFace.WEST, BlockFace.WEST_NORTH_WEST, BlockFace.NORTH_WEST, BlockFace.NORTH_NORTH_WEST
         };
         Map<BlockFace, BlockFace> map = new EnumMap<>(BlockFace.class);
         for (int i = 0; i < faces.length; i++) {
@@ -72,10 +75,10 @@ public class BlockRotatorListener implements Listener {
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK
-                || event.getHand() != EquipmentSlot.HAND
-                || !event.getPlayer().isSneaking()
-                || event.getPlayer().getInventory().getItemInMainHand().getType() != ROTATION_TOOL
-                || !event.getPlayer().hasPermission(PERMISSION_USE)) {
+            || event.getHand() != EquipmentSlot.HAND
+            || !event.getPlayer().isSneaking()
+            || event.getPlayer().getInventory().getItemInMainHand().getType() != ROTATION_TOOL
+            || !event.getPlayer().hasPermission(PERMISSION_USE)) {
             return;
         }
 
@@ -141,8 +144,8 @@ public class BlockRotatorListener implements Listener {
     private boolean rotateBisected(Block block, Bisected bisected) {
         // Determine the lower‑half block
         Block lower = bisected.getHalf() == Bisected.Half.TOP
-                ? block.getRelative(BlockFace.DOWN)
-                : block;
+            ? block.getRelative(BlockFace.DOWN)
+            : block;
         BlockData lowerData = lower.getBlockData();
 
         // Only rotate if it's a Directional type

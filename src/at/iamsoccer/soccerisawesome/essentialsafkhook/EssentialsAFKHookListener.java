@@ -1,6 +1,9 @@
 package at.iamsoccer.soccerisawesome.essentialsafkhook;
 
+import at.iamsoccer.soccerisawesome.AbstractModule;
 import at.iamsoccer.soccerisawesome.SoccerIsAwesomePlugin;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.PaperCommandManager;
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.User;
 import net.ess3.api.events.AfkStatusChangeEvent;
@@ -12,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,21 +23,35 @@ import java.util.ArrayList;
 import static com.earth2me.essentials.I18n.tl;
 
 
-public class EssentialsAFKHookListener implements Listener {
-    private final Essentials essentials;
+public class EssentialsAFKHookListener extends AbstractModule implements Listener {
     private final ArrayList<AFKMessageRecord> permissionMessages = new ArrayList<>();
-    private final SoccerIsAwesomePlugin plugin;
+    private Essentials essentials;
+    private @Nullable BaseCommand command = null;
 
     public EssentialsAFKHookListener(SoccerIsAwesomePlugin plugin) {
-        this.plugin = plugin;
-        essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
-        reload();
+        super(plugin, "EssentialsAFKHook");
     }
 
+    @Override
+    public boolean enable(PaperCommandManager commandManager) {
+        if (Bukkit.getPluginManager().getPlugin("Essentials") == null) {
+            warn("Essentials not installed!");
+            return false;
+        }
+        if (!super.enable(commandManager)) return false;
+        essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
+
+        command = new EssentialsAFKHookCommands(this);
+        commandManager.registerCommand(command);
+
+        return true;
+    }
+
+    @Override
     public void reload() {
         permissionMessages.clear();
         plugin.saveResource("essentialsafk-config.yml", false);
-        var config = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(),"essentialsafk-config.yml"));
+        var config = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "essentialsafk-config.yml"));
         for (String permission : config.getKeys(true)) {
             if (!config.isString(permission + ".message") || !config.isString(permission + ".msg-response")) continue;
             final String message = config.getString(permission + ".message");
@@ -47,6 +65,16 @@ public class EssentialsAFKHookListener implements Listener {
         }
     }
 
+    @Override
+    public boolean disable(PaperCommandManager commandManager) {
+        if (!super.disable(commandManager)) return false;
+        if (command != null) {
+            commandManager.unregisterCommand(command);
+            command = null;
+        }
+        return true;
+    }
+
     private void registerPermission(Permission perm) {
         if (Bukkit.getPluginManager().getPermission(perm.getName()) != null) return;
         Bukkit.getPluginManager().addPermission(perm);
@@ -55,7 +83,7 @@ public class EssentialsAFKHookListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerLeave(PlayerQuitEvent event) {
         // unhide them when they leave, just to be sure if this breaks
-        final User user = (User) essentials.getUser(event.getPlayer());
+        final User user = essentials.getUser(event.getPlayer());
         if (!user.isVanished()) user.setHidden(false);
     }
 
