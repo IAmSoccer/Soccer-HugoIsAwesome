@@ -1,5 +1,6 @@
 package at.iamsoccer.soccerisawesome;
 
+import at.iamsoccer.soccerisawesome.blockrotator.BlockRotatorListener;
 import at.iamsoccer.soccerisawesome.colorfulshulkers.ColorfulShulkers;
 import at.iamsoccer.soccerisawesome.damagenullifier.DamageNullifierOnTeleportOrJoinNullifyListener;
 import at.iamsoccer.soccerisawesome.essentialsafkhook.EssentialsAFKHookListener;
@@ -48,7 +49,8 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
             new LessAnnoyingItemFramesListener(this),
             new PrettyColoredGlassListener(this),
             new EssentialsAFKHookListener(this),
-            new ColorfulShulkers(this)
+            new ColorfulShulkers(this),
+            new BlockRotatorListener(this)
         ));
 
         var iter = modules.iterator();
