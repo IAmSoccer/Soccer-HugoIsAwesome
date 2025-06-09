@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
@@ -16,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.stream.Collectors;
 
 import static io.papermc.paper.command.brigadier.Commands.argument;
 import static io.papermc.paper.command.brigadier.Commands.literal;
@@ -61,8 +61,19 @@ public class SizeChangerCommand {
                     if (!module.isAllowedToUse(player, size)) {
                         var limits = module.getLimits(player);
                         player.sendMessage(module.config.getComponent("commands.outside-range", TagResolver.builder()
-                            .tag("sizes", Tag.inserting(Component.text(
-                                limits.stream().map(minMaxSize -> "[%s Blocks, %s Blocks]".formatted(minMaxSize.min(), minMaxSize.max())).collect(Collectors.joining(", "))
+                            .tag("sizes", Tag.inserting(Component.join(
+                                JoinConfiguration.builder().separator(module.config.getComponent("list-separator")).build(),
+                                limits.stream().map(range -> module.config.getComponent("formats.range", TagResolver.builder()
+                                    .tag("min", Tag.inserting(
+                                        module.config.getComponent("formats.blocks", TagResolver.builder()
+                                            .tag("cm", Tag.inserting(Component.text(range.min())))
+                                            .build())
+                                    )).tag("max", Tag.inserting(
+                                        module.config.getComponent("formats.blocks", TagResolver.builder()
+                                            .tag("cm", Tag.inserting(Component.text(range.max())))
+                                            .build())
+                                    )).build())
+                                ).toList()
                             )))
                             .build()));
                         return Command.SINGLE_SUCCESS;
@@ -83,8 +94,19 @@ public class SizeChangerCommand {
                     if (!module.isAllowedToUse(player, size)) {
                         var limits = module.getLimits(player);
                         player.sendMessage(module.config.getComponent("commands.outside-range", TagResolver.builder()
-                            .tag("sizes", Tag.inserting(Component.text(
-                                limits.stream().map(minMaxSize -> "[%s cm, %s cm]".formatted(minMaxSize.min() * 100, minMaxSize.max() * 100)).collect(Collectors.joining(", "))
+                            .tag("sizes", Tag.inserting(Component.join(
+                                JoinConfiguration.builder().separator(module.config.getComponent("list-separator")).build(),
+                                limits.stream().map(range -> module.config.getComponent("formats.range", TagResolver.builder()
+                                    .tag("min", Tag.inserting(
+                                        module.config.getComponent("formats.cm", TagResolver.builder()
+                                            .tag("cm", Tag.inserting(Component.text(range.min())))
+                                            .build())
+                                    )).tag("max", Tag.inserting(
+                                        module.config.getComponent("formats.cm", TagResolver.builder()
+                                            .tag("cm", Tag.inserting(Component.text(range.max())))
+                                            .build())
+                                    )).build())
+                                ).toList()
                             )))
                             .build()));
                         return Command.SINGLE_SUCCESS;
@@ -108,13 +130,13 @@ public class SizeChangerCommand {
                         if (!module.isAllowedToUse(player, size)) {
                             var limits = module.getLimits(player);
                             player.sendMessage(module.config.getComponent("commands.outside-range", TagResolver.builder()
-                                .tag("sizes", Tag.inserting(Component.text(
-                                    limits.stream().map(SizeChangerCommand::blocksToFeetAndInches).collect(Collectors.joining(", "))
+                                .tag("sizes", Tag.inserting(Component.join(
+                                    JoinConfiguration.builder().separator(module.config.getComponent("list-separator")).build(),
+                                    limits.stream().map(s -> blocksToFeetAndInches(s, module)).toList()
                                 )))
                                 .build()));
                             return Command.SINGLE_SUCCESS;
                         }
-
                         module.setSize(livingEntity, size);
                         return Command.SINGLE_SUCCESS;
                     })
@@ -126,15 +148,23 @@ public class SizeChangerCommand {
         return feet * METERS_PER_FEET + inches * METERS_PER_INCH;
     }
 
-    private static String blocksToFeetAndInches(SizeChangerModule.MinMaxSize minMaxSize) {
-        return "[%s, %s]".formatted(blocksToFeetAndInches(minMaxSize.min(), RoundingMode.UP), blocksToFeetAndInches(minMaxSize.max(), RoundingMode.DOWN));
+    private static Component blocksToFeetAndInches(SizeChangerModule.MinMaxSize minMaxSize, SizeChangerModule module) {
+        return module.config.getComponent("formats.range", TagResolver.builder()
+            .tag("min", Tag.inserting(blocksToFeetAndInches(minMaxSize.min(), RoundingMode.UP, module)))
+            .tag("max", Tag.inserting(blocksToFeetAndInches(minMaxSize.max(), RoundingMode.DOWN, module)))
+            .build()
+        );
     }
 
-    private static String blocksToFeetAndInches(double blocks, RoundingMode roundingMode) {
+    private static Component blocksToFeetAndInches(double blocks, RoundingMode roundingMode, SizeChangerModule module) {
         int feet = (int) (blocks / METERS_PER_FEET);
         double remainder = blocks % METERS_PER_FEET;
         double inches = remainder / METERS_PER_INCH;
-        return "%s ft %s in".formatted(feet, new BigDecimal(inches).setScale(0, roundingMode).doubleValue());
+        return module.config.getComponent("formats.feet", TagResolver.builder()
+            .tag("ft", Tag.inserting(Component.text(feet)))
+            .tag("in", Tag.inserting(Component.text(new BigDecimal(inches).setScale(0, roundingMode).intValue())))
+            .build()
+        );
     }
 
     private static @Nullable LivingEntity getLivingEntity(Entity tragetEntity, CommandSender sender, SizeChangerModule module) {
