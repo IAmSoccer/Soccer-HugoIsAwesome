@@ -8,8 +8,10 @@ import at.iamsoccer.soccerisawesome.infinitesnowball.InfiniteSnowballModule;
 import at.iamsoccer.soccerisawesome.lessannoyingitemframes.LessAnnoyingItemFramesListener;
 import at.iamsoccer.soccerisawesome.prettycoloredglass.PrettyColoredGlassListener;
 import at.iamsoccer.soccerisawesome.sheepcolorchanger.SheepColorChangerListener;
+import at.iamsoccer.soccerisawesome.sizechanger.SizeChangerModule;
 import at.iamsoccer.soccerisawesome.woodcutter.WoodCutter;
 import co.aikar.commands.PaperCommandManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -50,7 +52,8 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
             new PrettyColoredGlassListener(this),
             new EssentialsAFKHookListener(this),
             new ColorfulShulkers(this),
-            new BlockRotatorListener(this)
+            new BlockRotatorListener(this),
+            new SizeChangerModule(this)
         ));
 
         var iter = modules.iterator();
@@ -66,6 +69,13 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
         }
 
         getServer().getConsoleSender().sendMessage("Hi -Lynch");
+
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+            for (AbstractModule module : modules) {
+                module.lifeCicleHandler(commands);
+            }
+        });
+
         reload();
     }
 

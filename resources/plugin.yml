@@ -19,6 +19,9 @@ softdepend:
   - Essentials
 loadbefore: []
 
+libraries:
+  - "at.hugob.plugin.library:config:1.2.6"
+
 
 permissions:
 # DamageNullifier Permissions

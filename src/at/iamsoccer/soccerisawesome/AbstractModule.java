@@ -1,9 +1,12 @@
 package at.iamsoccer.soccerisawesome;
 
 import co.aikar.commands.PaperCommandManager;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,9 +41,9 @@ public abstract class AbstractModule {
         reload();
     }
 
-    public void reload() {
+    public void reload() {}
 
-    }
+    public void lifeCicleHandler(ReloadableRegistrarEvent<@NotNull Commands> commands) {}
 
     public boolean disable(PaperCommandManager commandManager) {
         for (Listener listener : listeners) {

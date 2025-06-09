@@ -1,0 +1,29 @@
+defaults:
+  min: 1.5
+  max: 2
+permissions:
+  tiny:
+    min: 0.1
+    defaults-to: op
+  big:
+    max: 4
+    defaults-to: op
+
+attributes:
+  flying_speed: 0.25
+  gravity: 0.66
+  jump_strength: 0.75
+  safe_fall_distance: 0.75
+  max_health: 0
+  movement_speed: 0.33
+  step_height:
+    bigger: 1
+    smaller: 0.25
+
+prefix: "SizeChanger >> "
+commands:
+  reload:
+    start: "<ref:prefix>Reload started"
+    finish: "<ref:prefix>Reload ended"
+  target-must-be-a-living-entity: "<ref:prefix>Target must be a living entity!" # never really used, if used its a very technical reason that it was used...
+  outside-range: "<ref:prefix>You only have access to the sizes: <sizes>"
