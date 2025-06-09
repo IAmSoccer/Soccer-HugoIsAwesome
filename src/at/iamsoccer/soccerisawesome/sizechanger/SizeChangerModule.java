@@ -28,6 +28,7 @@ public class SizeChangerModule extends AbstractModule {
     public YamlFileConfig config;
     public Permission usePerm;
     public Permission reloadPerm;
+    public Permission bypassPerm;
 
     public final Set<AttributeInfo> attributeTypes = new HashSet<>();
 
@@ -41,13 +42,13 @@ public class SizeChangerModule extends AbstractModule {
         if (!super.enable(commandManager)) return false;
         config = new YamlFileConfig(plugin, "size-changer.yml");
         usePerm = new Permission("shia.sizechanger.use", "Allows the usage of the /height command", PermissionDefault.OP);
-        if (Bukkit.getPluginManager().getPermission(usePerm.getName()) == null) {
-            Bukkit.getPluginManager().addPermission(usePerm);
-        }
+        Bukkit.getPluginManager().addPermission(usePerm);
         reloadPerm = new Permission("shia.sizechanger.reload", "Allows to reload via /height reload", PermissionDefault.OP);
-        if (Bukkit.getPluginManager().getPermission(usePerm.getName()) == null) {
-            Bukkit.getPluginManager().addPermission(usePerm);
-        }
+        usePerm.addParent(reloadPerm, true);
+        Bukkit.getPluginManager().addPermission(reloadPerm);
+        bypassPerm = new Permission("shia.sizechanger.bypass", "AllowsToUseAnySize", PermissionDefault.OP);
+        usePerm.addParent(bypassPerm, true);
+        Bukkit.getPluginManager().addPermission(bypassPerm);
         return true;
     }
 
@@ -56,15 +57,19 @@ public class SizeChangerModule extends AbstractModule {
         sizePermissions.stream().filter(p -> p.permission != null).forEach(sp -> Bukkit.getPluginManager().removePermission(sp.permission));
         sizePermissions.clear();
         config.reload();
-        var def = new SizePermission(
-            null, new MinMaxSize(
-            config.getDouble("defaults.min"),
-            config.getDouble("defaults.max")
-        ));
-        sizePermissions.add(def);
         for (String permission : config.getConfigurationSection("permissions").getKeys(false)) {
-            var min = config.getDouble("permissions." + permission + ".min", def.minMax.min);
-            var max = config.getDouble("permissions." + permission + ".max", def.minMax.max);
+            String path = "permissions." + permission + ".min";
+            if (!config.isDouble(path) && !config.isInt(path)) {
+                warn(path + " is missing! cant register " + permission);
+                continue;
+            }
+            var min = config.getDouble(path);
+            path = "permissions." + permission + ".max";
+            if (!config.isDouble(path) && !config.isInt(path)) {
+                warn(path + " is missing! cant register " + permission);
+                continue;
+            }
+            var max = config.getDouble(path);
             sizePermissions.add(new SizePermission(
                 new Permission(
                     "shia.sizechanger." + permission,
@@ -74,7 +79,10 @@ public class SizeChangerModule extends AbstractModule {
                 new MinMaxSize(min, max)
             ));
         }
-        sizePermissions.stream().filter(p -> p.permission != null).forEach(sp -> Bukkit.getPluginManager().addPermission(sp.permission));
+        sizePermissions.stream().filter(p -> p.permission != null).forEach(sp -> {
+            Bukkit.getPluginManager().addPermission(sp.permission);
+            usePerm.addParent(sp.permission, true);
+        });
 
         attributeTypes.clear();
         attributeTypes.add(new AttributeInfo(Attribute.SCALE, 1, 1));
@@ -110,6 +118,7 @@ public class SizeChangerModule extends AbstractModule {
     }
 
     public boolean isAllowedToUse(Player player, double num) {
+        if (player.hasPermission(bypassPerm)) return true;
         for (SizePermission perm : sizePermissions) {
             if (perm.isAllowedToUse(player, num)) return true;
         }

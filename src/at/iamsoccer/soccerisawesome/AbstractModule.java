@@ -57,6 +57,6 @@ public abstract class AbstractModule {
     }
 
     public final void warn(String s) {
-        plugin.warn(String.format("[%s] %s]", name, s));
+        plugin.warn(String.format("[%s] %s", name, s));
     }
 }

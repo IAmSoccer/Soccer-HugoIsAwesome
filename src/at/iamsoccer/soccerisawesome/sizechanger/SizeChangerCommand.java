@@ -66,11 +66,11 @@ public class SizeChangerCommand {
                                 limits.stream().map(range -> module.config.getComponent("formats.range", TagResolver.builder()
                                     .tag("min", Tag.inserting(
                                         module.config.getComponent("formats.blocks", TagResolver.builder()
-                                            .tag("cm", Tag.inserting(Component.text(range.min())))
+                                            .tag("blocks", Tag.inserting(Component.text(range.min())))
                                             .build())
                                     )).tag("max", Tag.inserting(
                                         module.config.getComponent("formats.blocks", TagResolver.builder()
-                                            .tag("cm", Tag.inserting(Component.text(range.max())))
+                                            .tag("blocks", Tag.inserting(Component.text(range.max())))
                                             .build())
                                     )).build())
                                 ).toList()
