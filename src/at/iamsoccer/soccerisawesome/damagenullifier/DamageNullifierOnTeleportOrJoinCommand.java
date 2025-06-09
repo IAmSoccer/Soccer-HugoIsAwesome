@@ -19,7 +19,7 @@ public class DamageNullifierOnTeleportOrJoinCommand extends BaseCommand {
     @CommandPermission("damagenullifier.reload")
     public void onReload(CommandSender sender) {
         sender.sendMessage("[DamageNullifier] Reloading");
-        module.reload();
+        module.reloadConfigAndModule();
         sender.sendMessage("[DamageNullifier] Reloaded");
     }
 }
