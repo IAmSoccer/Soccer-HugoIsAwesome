@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 
+import at.iamsoccer.soccerisawesome.blockrotator.BlockRotatorListener;
 import at.iamsoccer.soccerisawesome.colorfulshulkers.ColorfulShulkers;
 import at.iamsoccer.soccerisawesome.damagenullifier.*;
 import at.iamsoccer.soccerisawesome.essentialsafkhook.EssentialsAFKHookCommands;
@@ -19,6 +20,7 @@ import at.iamsoccer.soccerisawesome.prettycoloredglass.PrettyColoredGlassListene
 import at.iamsoccer.soccerisawesome.sheepcolorchanger.*;
 import at.iamsoccer.soccerisawesome.woodcutter.*;
 import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import co.aikar.commands.PaperCommandManager;
@@ -82,6 +84,9 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
             getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD + "SHIA" + ChatColor.GRAY + "]" + ChatColor.RED + " Module ColorfulShulkers Failed to load all or some recipes.... Disabling Plugin");
             this.getServer().getPluginManager().disablePlugin(this);
         }
+        //BlockRotator Stuff
+        getServer().getPluginManager().registerEvents(new BlockRotatorListener(this), this);
+        getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD + "SHIA" + ChatColor.GRAY + "]" + ChatColor.GREEN + " Module BlockRotator has been enabled!");
     }
 
     @Override
@@ -99,6 +104,7 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
         getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD + "SHIA" + ChatColor.GRAY + "]" + ChatColor.RED + " Module LessAnnoyingItemFrames has been disabled!");
         getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD + "SHIA" + ChatColor.GRAY + "]" + ChatColor.RED + " Module PrettyColoredClass has been disabled!");
         getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD + "SHIA" + ChatColor.GRAY + "]" + ChatColor.RED + " Module EssentialsAFKHook has been disabled!");
+        getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD + "SHIA" + ChatColor.GRAY + "]" + ChatColor.RED + " Module BlockRotator has been disabled!");
         if(ColorfulShulkers.tryRemoveColorfulShulkerRecipes()) {
             getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.GOLD + "SHIA" + ChatColor.GRAY + "]" + ChatColor.RED + " Module ColorfulShulkers has been disabled!");
         }

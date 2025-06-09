@@ -77,3 +77,7 @@ permissions:
   sia.essentialsafk.reload:
     description: Allows you to reload the Essentials AFK config
     default: op
+  # Block Rotator Permissions
+  sia.blockrotator.use:
+    description: Allows you to use block rotator
+    default: op
