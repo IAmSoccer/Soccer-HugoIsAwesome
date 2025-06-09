@@ -127,7 +127,7 @@ public class SizeChangerCommand {
     }
 
     private static String blocksToFeetAndInches(SizeChangerModule.MinMaxSize minMaxSize) {
-        return "[%s ,%s]".formatted(blocksToFeetAndInches(minMaxSize.min(), RoundingMode.UP), blocksToFeetAndInches(minMaxSize.max(), RoundingMode.DOWN));
+        return "[%s, %s]".formatted(blocksToFeetAndInches(minMaxSize.min(), RoundingMode.UP), blocksToFeetAndInches(minMaxSize.max(), RoundingMode.DOWN));
     }
 
     private static String blocksToFeetAndInches(double blocks, RoundingMode roundingMode) {
