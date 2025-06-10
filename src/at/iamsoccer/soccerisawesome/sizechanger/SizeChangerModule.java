@@ -148,8 +148,8 @@ public class SizeChangerModule extends AbstractModule {
     }
 
     public void resetSize(LivingEntity livingEntity) {
-        for (var attributeType : attributeTypes) {
-            var attribute = livingEntity.getAttribute(attributeType.type);
+        for (var attributeType : Registry.ATTRIBUTE) {
+            var attribute = livingEntity.getAttribute(attributeType);
             if (attribute != null) {
                 attribute.removeModifier(ATTRIBUTE_KEY);
             }

@@ -16,7 +16,7 @@ public abstract class AbstractModule {
     private final String name;
     private final List<Listener> listeners;
 
-    protected final SoccerIsAwesomePlugin plugin;
+    public final SoccerIsAwesomePlugin plugin;
 
     public AbstractModule(SoccerIsAwesomePlugin plugin, String name, Listener... listeners) {
         this.plugin = plugin;

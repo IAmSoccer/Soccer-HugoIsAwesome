@@ -59,11 +59,16 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
         var iter = modules.iterator();
         while (iter.hasNext()) {
             var module = iter.next();
-            if (module.enable(commandManager)) {
-                info("Module " + module.getName() + " has been enabled!");
-            } else {
-                warn("Module " + module.getName() + " Failed to properly load and has been disabled!");
-                if (!disableModule(module)) return;
+            try {
+                if (module.enable(commandManager)) {
+                    info("Module " + module.getName() + " has been enabled!");
+                } else {
+                    warn("Module " + module.getName() + " Failed to properly load and has been disabled!");
+                    if (!disableModule(module)) return;
+                    iter.remove();
+                }
+            } catch (Exception | Error e) {
+                severe("Loading module " + module.getName() + " failed with an error and has been disabled!", e);
                 iter.remove();
             }
         }
@@ -103,7 +108,7 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
         modules.forEach(AbstractModule::reload);
     }
 
-    public void severe(String message, Exception e) {
+    public void severe(String message, Throwable e) {
         var lines = new ArrayList<String>();
         lines.add(message);
         lines.add(e.getMessage());

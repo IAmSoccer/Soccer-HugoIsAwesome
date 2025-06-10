@@ -34,3 +34,13 @@ commands:
     finish: "<ref:prefix>Reload ended"
   target-must-be-a-living-entity: "<ref:prefix>Target must be a living entity!" # never really used, if used its a very technical reason that it was used...
   outside-range: "<ref:prefix>You only have access to the sizes: <sizes>"
+  on-cooldown: "<ref:prefix>You can only use this command again in <remaining>"
+
+cooldown: 60 # seconds
+
+formats:
+  list-separator: ", "
+  range: "[<min>, <max>]"
+  feet: "<ft> ft <in> in"
+  blocks: "<blocks> blocks"
+  cm: "<cm> cm"
