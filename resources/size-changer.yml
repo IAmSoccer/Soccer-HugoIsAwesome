@@ -35,6 +35,8 @@ commands:
   target-must-be-a-living-entity: "<ref:prefix>Target must be a living entity!" # never really used, if used its a very technical reason that it was used...
   outside-range: "<ref:prefix>You only have access to the sizes: <sizes>"
   on-cooldown: "<ref:prefix>You can only use this command again in <remaining>"
+  change-success: "<ref:prefix>Your size has been set to <size>"
+  already-that-tall: "<ref:prefix>You are already <size> tall!"
 
 cooldown: 60 # seconds
 

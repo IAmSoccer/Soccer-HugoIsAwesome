@@ -114,7 +114,7 @@ public class SizeChangerModule extends AbstractModule {
 
     @Override
     public void lifeCicleHandler(ReloadableRegistrarEvent<Commands> commands) {
-        commands.registrar().register(SizeChangerCommand.createCommand(this));
+        commands.registrar().register(new SizeChangerCommand(this).createCommand());
     }
 
     public boolean isAllowedToUse(Player player, double num) {
@@ -156,9 +156,17 @@ public class SizeChangerModule extends AbstractModule {
         }
     }
 
-    public void setSize(LivingEntity livingEntity, double sizeInBlocks) {
+    public boolean setSize(LivingEntity livingEntity, double sizeInBlocks) {
         // players are approcimately 1/10th smaller than a block, so I approximate it with an multiplication of 1.1
         final var factor = sizeInBlocks * 0.55D - 1;
+        final var scale = livingEntity.getAttribute(Attribute.SCALE);
+        if(scale != null) {
+            var modifier = scale.getModifier(ATTRIBUTE_KEY);
+            if(modifier != null && modifier.getAmount() == factor) {
+                return false;
+            }
+        }
+
         for (var attributeInfo : attributeTypes) {
             var attribute = livingEntity.getAttribute(attributeInfo.type);
             if (attribute != null) {
@@ -169,6 +177,7 @@ public class SizeChangerModule extends AbstractModule {
                 ));
             }
         }
+        return true;
     }
 
 
