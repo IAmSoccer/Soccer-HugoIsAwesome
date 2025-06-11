@@ -136,7 +136,6 @@ public class SizeChangerCommand {
 
         if (!module.isAllowedToUse(player, size)) {
             var limits = module.getLimits(player);
-            limits.stream().map(rangeToComponentFunction).forEach(player::sendMessage);
             player.sendMessage(module.config.getComponent("commands.outside-range", TagResolver.builder()
                 .tag("sizes", Tag.inserting(Component.join(
                     JoinConfiguration.builder().separator(module.config.getComponent("formats.list-separator")).build(),
