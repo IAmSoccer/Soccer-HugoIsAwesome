@@ -1,0 +1,48 @@
+permissions:
+  tiny:
+    min: 0.5
+    max: 1.5
+    defaults-to: op
+  normal:
+    min: 1.5
+    max: 2
+    defaults-to: op
+  big:
+    min: 2
+    max: 4
+    defaults-to: op
+
+attributes:
+  flying_speed: 0.25
+  gravity:
+    smaller: 0.33
+    bigger: 0.55
+  jump_strength:
+    smaller: 0.3
+    bigger: 0.75
+  safe_fall_distance: 0.75
+  max_health: 0
+  movement_speed: 0.20
+  step_height:
+    bigger: 1
+    smaller: 0.25
+
+prefix: "SizeChanger >> "
+commands:
+  reload:
+    start: "<ref:prefix>Reload started"
+    finish: "<ref:prefix>Reload ended"
+  target-must-be-a-living-entity: "<ref:prefix>Target must be a living entity!" # never really used, if used its a very technical reason that it was used...
+  outside-range: "<ref:prefix>You only have access to the sizes: <sizes>"
+  on-cooldown: "<ref:prefix>You can only use this command again in <remaining>"
+  change-success: "<ref:prefix>Your size has been set to <size>"
+  already-that-tall: "<ref:prefix>You are already <size> tall!"
+
+cooldown: 60 # seconds
+
+formats:
+  list-separator: ", "
+  range: "[<min>, <max>]"
+  feet: "<ft> ft <in> in"
+  blocks: "<blocks> blocks"
+  cm: "<cm> cm"

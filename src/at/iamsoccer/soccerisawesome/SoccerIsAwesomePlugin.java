@@ -8,8 +8,10 @@ import at.iamsoccer.soccerisawesome.infinitesnowball.InfiniteSnowballModule;
 import at.iamsoccer.soccerisawesome.lessannoyingitemframes.LessAnnoyingItemFramesListener;
 import at.iamsoccer.soccerisawesome.prettycoloredglass.PrettyColoredGlassListener;
 import at.iamsoccer.soccerisawesome.sheepcolorchanger.SheepColorChangerListener;
+import at.iamsoccer.soccerisawesome.sizechanger.SizeChangerModule;
 import at.iamsoccer.soccerisawesome.woodcutter.WoodCutter;
 import co.aikar.commands.PaperCommandManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -50,22 +52,35 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
             new PrettyColoredGlassListener(this),
             new EssentialsAFKHookListener(this),
             new ColorfulShulkers(this),
-            new BlockRotatorListener(this)
+            new BlockRotatorListener(this),
+            new SizeChangerModule(this)
         ));
 
         var iter = modules.iterator();
         while (iter.hasNext()) {
             var module = iter.next();
-            if (module.enable(commandManager)) {
-                info("Module " + module.getName() + " has been enabled!");
-            } else {
-                warn("Module " + module.getName() + " Failed to properly load and has been disabled!");
-                if (!disableModule(module)) return;
+            try {
+                if (module.enable(commandManager)) {
+                    info("Module " + module.getName() + " has been enabled!");
+                } else {
+                    warn("Module " + module.getName() + " Failed to properly load and has been disabled!");
+                    if (!disableModule(module)) return;
+                    iter.remove();
+                }
+            } catch (Exception | Error e) {
+                severe("Loading module " + module.getName() + " failed with an error and has been disabled!", e);
                 iter.remove();
             }
         }
 
         getServer().getConsoleSender().sendMessage("Hi -Lynch");
+
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+            for (AbstractModule module : modules) {
+                module.lifeCicleHandler(commands);
+            }
+        });
+
         reload();
     }
 
@@ -93,7 +108,7 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
         modules.forEach(AbstractModule::reload);
     }
 
-    public void severe(String message, Exception e) {
+    public void severe(String message, Throwable e) {
         var lines = new ArrayList<String>();
         lines.add(message);
         lines.add(e.getMessage());
