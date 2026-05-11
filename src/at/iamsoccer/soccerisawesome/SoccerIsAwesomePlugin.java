@@ -1,6 +1,7 @@
 package at.iamsoccer.soccerisawesome;
 
 import at.iamsoccer.soccerisawesome.blockrotator.BlockRotatorListener;
+import at.iamsoccer.soccerisawesome.cauldronconcrete.CauldronConcreteModule;
 import at.iamsoccer.soccerisawesome.colorfulshulkers.ColorfulShulkers;
 import at.iamsoccer.soccerisawesome.damagenullifier.DamageNullifierOnTeleportOrJoinNullifyListener;
 import at.iamsoccer.soccerisawesome.essentialsafkhook.EssentialsAFKHookListener;
@@ -55,7 +56,8 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
             new ColorfulShulkers(this),
             new BlockRotatorListener(this),
             new SizeChangerModule(this),
-            new WaypointModule(this)
+            new WaypointModule(this),
+            new CauldronConcreteModule(this)
         ));
 
         var iter = modules.iterator();
