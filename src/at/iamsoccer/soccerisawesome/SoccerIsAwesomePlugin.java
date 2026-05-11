@@ -9,6 +9,7 @@ import at.iamsoccer.soccerisawesome.lessannoyingitemframes.LessAnnoyingItemFrame
 import at.iamsoccer.soccerisawesome.prettycoloredglass.PrettyColoredGlassListener;
 import at.iamsoccer.soccerisawesome.sheepcolorchanger.SheepColorChangerListener;
 import at.iamsoccer.soccerisawesome.sizechanger.SizeChangerModule;
+import at.iamsoccer.soccerisawesome.waypoints.WaypointModule;
 import at.iamsoccer.soccerisawesome.woodcutter.WoodCutter;
 import co.aikar.commands.PaperCommandManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -53,7 +54,8 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
             new EssentialsAFKHookListener(this),
             new ColorfulShulkers(this),
             new BlockRotatorListener(this),
-            new SizeChangerModule(this)
+            new SizeChangerModule(this),
+            new WaypointModule(this)
         ));
 
         var iter = modules.iterator();
@@ -76,8 +78,9 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
         getServer().getConsoleSender().sendMessage("Hi -Lynch");
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+            final var registrar = commands.registrar();
             for (AbstractModule module : modules) {
-                module.lifeCicleHandler(commands);
+                module.lifecycleHandler(registrar::register);
             }
         });
 

@@ -2,7 +2,7 @@ name: SHIA
 version: ${project.version}
 description: ${project.description}
 load: STARTUP
-api-version: '1.19'
+api-version: '1.21.10'
 author: Hugo B.
 authors:
   - IAmSoccer
@@ -20,7 +20,7 @@ softdepend:
 loadbefore: []
 
 libraries:
-  - "at.hugob.plugin.library:config:1.2.6"
+  - "at.hugob.plugin.library:config:1.2.9"
 
 
 permissions:

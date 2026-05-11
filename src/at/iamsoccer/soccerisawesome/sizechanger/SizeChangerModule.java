@@ -4,8 +4,8 @@ import at.hugob.plugin.library.config.YamlFileConfig;
 import at.iamsoccer.soccerisawesome.AbstractModule;
 import at.iamsoccer.soccerisawesome.SoccerIsAwesomePlugin;
 import co.aikar.commands.PaperCommandManager;
-import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class SizeChangerModule extends AbstractModule {
     public static final NamespacedKey ATTRIBUTE_KEY = new NamespacedKey("shia", "size_changer");
@@ -113,8 +114,8 @@ public class SizeChangerModule extends AbstractModule {
     }
 
     @Override
-    public void lifeCicleHandler(ReloadableRegistrarEvent<Commands> commands) {
-        commands.registrar().register(new SizeChangerCommand(this).createCommand());
+    public void lifecycleHandler(Consumer<LiteralCommandNode<CommandSourceStack>> register) {
+        register.accept(new SizeChangerCommand(this).createCommand());
     }
 
     public boolean isAllowedToUse(Player player, double num) {
