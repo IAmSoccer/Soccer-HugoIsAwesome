@@ -1,0 +1,28 @@
+waypoint-options:
+  0: "OFF"
+  32: "Local"
+  500: "500 Blocks"
+  1_000: "1_000 Blocks"
+  2_000: "2_000 Blocks"
+  4_000: "4_000 Blocks"
+  8_000: "8_000 Blocks"
+  16_000: "16_000 Blocks"
+  32_000: "32_000 Blocks"
+  64_000: "64_000 Blocks"
+  128_000: "128_000 Blocks"
+  256_000: "256_000 Blocks"
+  512_000: "512_000 Blocks"
+  1_000_000: "1_000_000 Blocks"
+  2_000_000: "2_000_000 Blocks"
+  4_000_000: "4_000_000 Blocks"
+  8_000_000: "8_000_000 Blocks"
+  16_000_000: "16_000_000 Blocks"
+  32_000_000: "32_000_000 Blocks"
+  60_000_000: "60_000_000 Blocks"
+
+info-text:
+  - "Set the <hover:show_text:'The Range in blocks other Players see your Waypoint'>Transmission Range</hover> and the <hover:show_text:'The Range in blocks you see other Players Waypoints'>Receive Range</hover> for Waypoints."
+
+title: "Waypoint Settings"
+confirm: "Confirm"
+close: "Close"

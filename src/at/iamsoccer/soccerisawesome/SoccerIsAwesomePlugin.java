@@ -1,6 +1,8 @@
 package at.iamsoccer.soccerisawesome;
 
+import at.hugob.plugin.library.config.MiniMsgLegacyHybridSerializer;
 import at.iamsoccer.soccerisawesome.blockrotator.BlockRotatorListener;
+import at.iamsoccer.soccerisawesome.cauldronconcrete.CauldronConcreteModule;
 import at.iamsoccer.soccerisawesome.colorfulshulkers.ColorfulShulkers;
 import at.iamsoccer.soccerisawesome.damagenullifier.DamageNullifierOnTeleportOrJoinNullifyListener;
 import at.iamsoccer.soccerisawesome.essentialsafkhook.EssentialsAFKHookListener;
@@ -9,8 +11,14 @@ import at.iamsoccer.soccerisawesome.lessannoyingitemframes.LessAnnoyingItemFrame
 import at.iamsoccer.soccerisawesome.prettycoloredglass.PrettyColoredGlassListener;
 import at.iamsoccer.soccerisawesome.sheepcolorchanger.SheepColorChangerListener;
 import at.iamsoccer.soccerisawesome.sizechanger.SizeChangerModule;
+import at.iamsoccer.soccerisawesome.waypoints.WaypointModule;
 import at.iamsoccer.soccerisawesome.woodcutter.WoodCutter;
 import co.aikar.commands.PaperCommandManager;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class SoccerIsAwesomePlugin extends JavaPlugin {
@@ -53,7 +62,9 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
             new EssentialsAFKHookListener(this),
             new ColorfulShulkers(this),
             new BlockRotatorListener(this),
-            new SizeChangerModule(this)
+            new SizeChangerModule(this),
+            new WaypointModule(this),
+            new CauldronConcreteModule(this)
         ));
 
         var iter = modules.iterator();
@@ -76,12 +87,61 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
         getServer().getConsoleSender().sendMessage("Hi -Lynch");
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+            final var registrar = commands.registrar();
+            var shiaCommand = createShiaCommand();
             for (AbstractModule module : modules) {
-                module.lifeCicleHandler(commands);
+                module.lifecycleHandler(registrar::register);
             }
+            registrar.register(shiaCommand.build());
         });
 
         reload();
+    }
+
+    private LiteralArgumentBuilder<CommandSourceStack> createShiaCommand() {
+        var shiaCommand = Commands.literal("shia");
+        shiaCommand
+            .requires(css -> shiaCommand.getArguments().stream().anyMatch(node -> node.getRequirement().test(css)))
+            .then(Commands.literal("reload")
+                .requires(css -> css.getSender().hasPermission("sia.reload"))
+                .executes(ctx -> {
+                    final var sender = ctx.getSource().getSender();
+                    sender.sendMessage(MiniMsgLegacyHybridSerializer.INSTANCE.deserialize("<gray>[<yellow>SHIA<gray>] <white>Reloading all Modules"));
+                    saveDefaultConfig();
+                    reloadConfig();
+                    for (AbstractModule module : modules) {
+                        if (!module.hasReloadLogic()) continue;
+                        sender.sendMessage(MiniMsgLegacyHybridSerializer.INSTANCE.deserialize("<gray>[<yellow>SHIA<gray>] <white>Reloading <dark_aqua>" + module.getName()));
+                        module.reload();
+                    }
+                    sender.sendMessage(MiniMsgLegacyHybridSerializer.INSTANCE.deserialize("<gray>[<yellow>SHIA<gray>] <white>Reload finished"));
+                    return Command.SINGLE_SUCCESS;
+                })
+                .then(Commands.argument("module", StringArgumentType.word())
+                    .suggests((css, sb) -> CompletableFuture.supplyAsync(() -> {
+                        modules.stream()
+                            .filter(AbstractModule::hasReloadLogic)
+                            .filter(module -> module.getName().toLowerCase().startsWith(sb.getRemainingLowerCase()))
+                            .forEach(module -> sb.suggest(module.getName()));
+                        return sb.build();
+                    }))
+                    .executes(ctx -> {
+                        final var sender = ctx.getSource().getSender();
+                        final var targetModule = ctx.getArgument("module", String.class);
+                        for (AbstractModule module : modules) {
+                            if (module.getName().equalsIgnoreCase(targetModule)) {
+                                sender.sendMessage(MiniMsgLegacyHybridSerializer.INSTANCE.deserialize("<gray>[<yellow>SHIA<gray>] <white>Reloading <dark_aqua>" + module.getName()));
+                                module.reload();
+                                sender.sendMessage(MiniMsgLegacyHybridSerializer.INSTANCE.deserialize("<gray>[<yellow>SHIA<gray>] <white>Reload finished"));
+                                return Command.SINGLE_SUCCESS;
+                            }
+                        }
+                        sender.sendMessage(MiniMsgLegacyHybridSerializer.INSTANCE.deserialize("<gray>[<yellow>SHIA<gray>] <dark_red>Unknown Module <red>" + targetModule));
+                        return Command.SINGLE_SUCCESS;
+                    })
+                )
+            );
+        return shiaCommand;
     }
 
     private boolean disableModule(AbstractModule module) {
