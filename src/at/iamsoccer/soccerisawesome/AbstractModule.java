@@ -42,6 +42,14 @@ public abstract class AbstractModule {
         reload();
     }
 
+    public boolean hasReloadLogic() {
+        try {
+            return !this.getClass().getMethod("reload").getDeclaringClass().equals(AbstractModule.class);
+        } catch (NoSuchMethodException e) {
+            return true;
+        }
+    }
+
     public void reload() {}
 
     public void lifecycleHandler(Consumer<@NotNull LiteralCommandNode<CommandSourceStack>> register) {}
