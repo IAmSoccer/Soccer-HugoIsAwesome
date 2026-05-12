@@ -84,3 +84,9 @@ permissions:
   sia.blockrotator.use:
     description: Allows you to use block rotator
     default: op
+  sia.reload:
+    description: allows the usage of /shia reload
+    default: op
+  sia.waypoint:
+    description: allows the usage of /waypoint
+    default: op

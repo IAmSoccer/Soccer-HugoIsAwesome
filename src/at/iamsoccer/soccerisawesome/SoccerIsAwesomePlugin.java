@@ -103,7 +103,7 @@ public class SoccerIsAwesomePlugin extends JavaPlugin {
         shiaCommand
             .requires(css -> shiaCommand.getArguments().stream().anyMatch(node -> node.getRequirement().test(css)))
             .then(Commands.literal("reload")
-                .requires(css -> css.getSender().hasPermission("shia.reload"))
+                .requires(css -> css.getSender().hasPermission("sia.reload"))
                 .executes(ctx -> {
                     final var sender = ctx.getSource().getSender();
                     sender.sendMessage(MiniMsgLegacyHybridSerializer.INSTANCE.deserialize("<gray>[<yellow>SHIA<gray>] <white>Reloading all Modules"));
